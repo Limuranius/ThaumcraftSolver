@@ -18,8 +18,11 @@ class ThaumSolver:
 
         main_component = [initial_points.pop()]
         while initial_points:
+            self.print_grid()
             target = initial_points.pop()
             closest_point = min(main_component, key=lambda point: point.distance(target))
+            coords, aspects = self.find_aspects_between_points(target, closest_point)
+            main_component += coords
             self.fill_aspects_between_points(target, closest_point)
 
     def find_closest_aspect_hex(self, start: HexCoord) -> HexCoord:
@@ -50,10 +53,13 @@ class ThaumSolver:
             self.grid.set_data(coord, aspect)
 
     def print_grid(self):
+        pretty_grid = HexGrid(self.grid.radius)
         for coord, value in self.grid:
             if is_aspect(value):
-                self.grid.set_data(coord, to_string(value)[:3])
-        print(self.grid)
+                pretty_grid.set_data(coord, to_string(value)[:3])
+            else:
+                pretty_grid.set_data(coord, value)
+        print(pretty_grid)
 
 
 def is_aspect(value: int) -> bool:
