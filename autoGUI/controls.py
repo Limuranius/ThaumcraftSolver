@@ -24,6 +24,9 @@ class ThaumGUIController:
 
     used_aspects_counter: dict[AspectType, int]
 
+    current_scroll_pos: Point
+    inventory_scrolls_positions: list[Point]
+
     def __init__(self):
         self.used_aspects_counter = defaultdict(int)
 
@@ -85,7 +88,10 @@ class ThaumGUIController:
 
         self.aspects_position_grid = screen_utils.get_aspects_positions(screen)
 
-        self.hex_grid, self.hex_size, self.hex_grid_center_pos = screen_utils.scan_image(screen)
+        self.update_hex_grid(screen)
+
+        self.current_scroll_pos = screen_utils.find_current_scroll_position(screen)
+        self.inventory_scrolls_positions = screen_utils.find_scrolls_positions(screen)
 
     def place_hex_grid(self) -> None:
         s = solver.ThaumSolver(self.hex_grid)
@@ -104,3 +110,16 @@ class ThaumGUIController:
             pyautogui.click(clicks=amount, interval=0.3)
             self.used_aspects_counter[aspect] -= amount
             pyautogui.keyUp("shift")
+
+    def update_hex_grid(self, image: np.ndarray):
+        self.hex_grid, self.hex_size, self.hex_grid_center_pos = screen_utils.scan_image(image)
+
+    def switch_scroll(self):
+        pyautogui.keyDown("shift")
+        pyautogui.click(*self.current_scroll_pos)
+        if self.inventory_scrolls_positions:
+            pyautogui.click(*self.inventory_scrolls_positions.pop())
+        pyautogui.keyUp("shift")
+        time.sleep(1)
+        self.update_hex_grid(np.array(pyautogui.screenshot()))
+

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from .HexCoord import HexCoord, NEIGHBOR_DIRECTIONS
 
 FREE = -1
