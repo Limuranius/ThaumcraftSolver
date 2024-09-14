@@ -51,17 +51,9 @@ class ThaumSolver:
     def print_grid(self):
         for coord, value in self.grid:
             if is_aspect(value):
-                self.grid.set_data(coord, to_string(value)[:2])
+                self.grid.set_data(coord, to_string(value)[:3])
         print(self.grid)
+
 
 def is_aspect(value: int) -> bool:
     return value not in [FREE, WALL]
-
-
-g = HexGrid(2)
-g.set_data(HexCoord.from_axial(0, -2), ORDO)
-g.set_data(HexCoord.from_axial(2, 0), SENSUS)
-g.set_data(HexCoord.from_axial(-2, 2), COGNITIO)
-s = ThaumSolver(g)
-s.solve()
-s.print_grid()
