@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from aspects import *
+from custom_types import AspectType
 
 spritesheet_path = r"C:\Users\Gleb\PycharmProjects\ThaumcraftSolver\vision\T4aspects.png"
 spritesheet = cv2.imread(spritesheet_path)

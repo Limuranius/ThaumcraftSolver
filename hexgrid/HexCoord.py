@@ -1,6 +1,8 @@
+from math import sqrt
+
+
 # Flat top orientation (double-height)
 # odd-q
-
 
 def doubleheight_to_axial(col, row):
     q = col
@@ -87,6 +89,12 @@ class HexCoord:
         vec = self - other
         q, r = vec.axial
         return (abs(q) + abs(q + r) + abs(r)) // 2
+
+    def to_pixel(self, size: float):
+        q, r = self.axial
+        x = size * (3 / 2 * q)
+        y = size * (sqrt(3) / 2 * q + sqrt(3) * r)
+        return int(x), int(y)
 
 
 NEIGHBOR_DIRECTIONS = [

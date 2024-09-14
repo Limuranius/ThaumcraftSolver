@@ -1,6 +1,7 @@
 from hexgrid import HexGrid, HexCoord
 from aspects import *
 from hexgrid.HexGrid import FREE, WALL
+from custom_types import AspectType
 
 
 class ThaumSolver:

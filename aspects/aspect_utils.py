@@ -1,5 +1,5 @@
-from .aspects import *
 from .recipes import aspect_recipes
+from custom_types import AspectType
 
 
 def used_in_aspects(aspect: AspectType) -> list[AspectType]:

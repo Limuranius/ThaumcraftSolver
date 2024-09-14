@@ -1,5 +1,3 @@
-AspectType = int
-
 AER = 0
 ALIENSIS = 1
 AQUA = 2

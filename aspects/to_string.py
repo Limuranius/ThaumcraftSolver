@@ -1,4 +1,5 @@
 from .aspects import *
+from custom_types import AspectType
 
 to_string_table = {
     AER: "Aer",
