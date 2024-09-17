@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 from aspects import *
 from custom_types import AspectType
+from paths import ASPECTS_SPRITESHEET_PATH
 
-spritesheet_path = r"C:\Users\Gleb\PycharmProjects\ThaumcraftSolver\vision\T4aspects.png"
-spritesheet = cv2.imread(spritesheet_path)
-spritesheet_alpha = cv2.imread(spritesheet_path, cv2.IMREAD_UNCHANGED)[:, :, 3]
+spritesheet = cv2.imread(ASPECTS_SPRITESHEET_PATH)
+spritesheet_alpha = cv2.imread(ASPECTS_SPRITESHEET_PATH, cv2.IMREAD_UNCHANGED)[:, :, 3]
 
 SIZE = 32
 
@@ -16,7 +16,7 @@ def get_aspect_sprite(aspect: AspectType) -> np.ndarray:
     col = index % 16
     sprite = spritesheet[row * 32: (row + 1) * 32, col * 32: (col + 1) * 32]
     mask = get_aspect_sprite_mask(aspect)
-    sprite[~mask] = [102, 185, 226]
+    sprite[~mask] = [102, 185, 226]  # minigame background color
     return sprite
 
 

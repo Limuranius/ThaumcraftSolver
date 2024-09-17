@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from custom_types import PathNotFoundException
 from .HexCoord import HexCoord, NEIGHBOR_DIRECTIONS
 
 FREE = -1
@@ -51,9 +52,10 @@ class HexGrid:
         q, r = coord.axial
         return self.data[q][r]
 
-    def get_shortest_path(self, start: HexCoord, end: HexCoord):
+    def get_shortest_path(self, start: HexCoord, end: HexCoord) -> list[HexCoord]:
         paths_queue = [[start]]
-        while True:
+        visited = defaultdict(bool)
+        while paths_queue:
             path = paths_queue.pop(0)
             path_last_coord = path[-1]
             if path_last_coord == end:
@@ -64,24 +66,38 @@ class HexGrid:
                     in_bounds = new_coord.distance_from_center() <= self.radius
                     is_end = new_coord == end
                     is_free = self.get_data(new_coord) == FREE
-                    if in_bounds and (is_free or is_end):
+                    if in_bounds and (is_free or is_end) and not visited[new_coord.axial]:
+                        visited[new_coord.axial] = True
                         new_path = list(path) + [new_coord]
                         paths_queue.append(new_path)
+        raise PathNotFoundException(f"Path not found: {start=} {end=}")
 
-    def get_path(self, start: HexCoord, end: HexCoord, length: int):
-        paths_queue = [[start]]
-        while len(paths_queue[0]) <= length:
-            path = paths_queue.pop(0)
-            path_last_coord = path[-1]
-            if path_last_coord == end and len(path) == length:
-                return path
-            else:
-                for direction_index in range(6):
-                    new_coord = path_last_coord.neighbor(direction_index)
-                    in_bounds = new_coord.distance_from_center() <= self.radius
-                    is_end = new_coord == end
-                    is_free = self.get_data(*new_coord.axial) == FREE
-                    if in_bounds and (is_free or is_end):
-                        new_path = list(path) + [new_coord]
-                        paths_queue.append(new_path)
-        raise Exception("Path not found")
+    def get_path(self, start: HexCoord, end: HexCoord, length: int) -> list[HexCoord]:
+        answer = [None] * length
+        visited = defaultdict(bool)
+
+        def dfs(coord: HexCoord, curr_len: int) -> bool:
+            answer[curr_len - 1] = coord
+            if curr_len == length:
+                if coord == end:
+                    return True
+                else:
+                    return False
+            visited[coord.axial] = True
+            for direction_index in range(6):
+                new_coord = coord.neighbor(direction_index)
+                in_bounds = new_coord.distance_from_center() <= self.radius
+                is_end = new_coord == end
+                is_free = self.get_data(new_coord) == FREE
+                if in_bounds and (is_free or is_end) and not visited[new_coord.axial]:
+                    found_answer = dfs(new_coord, curr_len + 1)
+                    if found_answer:
+                        return True
+            visited[coord.axial] = False
+            return False
+
+        found_path = dfs(start, 1)
+        if found_path:
+            return answer
+        else:
+            raise PathNotFoundException(f"Path not found: {start=} {end=} {length=}")

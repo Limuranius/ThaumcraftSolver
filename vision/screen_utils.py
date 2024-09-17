@@ -1,11 +1,11 @@
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-from hexgrid import HexGrid, HexCoord
-from math import sqrt
-from . import hex_classifier
 import tqdm
+
 from custom_types import Box, Point
+from hexgrid import HexGrid, HexCoord
+from paths import SCROLL_TEMPLATE_PATH
+from . import hex_classifier
 
 
 def crop_box(image: np.ndarray, box: Box) -> np.ndarray:
@@ -43,10 +43,7 @@ def scan_image(img: np.ndarray) -> [HexGrid, float, Point]:
     minigame_box = get_minigame_area_box(img)
     img = crop_box(img, minigame_box)
 
-    h, w = img.shape[:2]
-    hex_size = h / 8.1 / 2
-    hex_size = int(hex_size)
-
+    hex_size = get_hex_size(img)
     h, w = img.shape[:2]
     cx = w // 2
     cy = h // 2
@@ -58,6 +55,14 @@ def scan_image(img: np.ndarray) -> [HexGrid, float, Point]:
         aspect = hex_classifier.classify_hex(hex_img)
         result.set_data(hex_coord, aspect)
     return result, hex_size, (cx + minigame_x, cy + minigame_y)
+
+
+def get_hex_size(minigame_img: np.ndarray) -> int:
+    h, w = minigame_img.shape[:2]
+    hex_size = h / 8.1 / 2
+    hex_size = int(hex_size)
+    return hex_size
+
 
 
 def get_thaum_gui_box(image: np.ndarray) -> Box:
@@ -108,7 +113,6 @@ def images_difference(img1, img2):
     img2 = img2.astype(int)
     diff = np.abs(img1 - img2).astype(np.uint8)
     return diff
-    # return np.all(img1 == img2, axis=2).astype(np.uint8) * 255
 
 
 def get_inventory_boxes(img: np.ndarray) -> list[Box]:
@@ -143,18 +147,13 @@ def get_inventory_boxes(img: np.ndarray) -> list[Box]:
 
 def find_scrolls_positions(img: np.ndarray) -> list[Point]:
     boxes = get_inventory_boxes(img)
-    scroll_img = cv2.imread(r"C:\Users\Gleb\PycharmProjects\ThaumcraftSolver\scroll.png")
+    scroll_img = cv2.imread(SCROLL_TEMPLATE_PATH)
     result = []
     for box in boxes:
         box_img = crop_box(img, box)
         box_img = cv2.resize(box_img, (scroll_img.shape[:2]))
         diff = images_difference(box_img, scroll_img)
         score = diff.mean() / 255
-        # print(score)
-        # cv2.imshow("1", box_img)
-        # cv2.imshow("2", scroll_img)
-        # cv2.imshow("diff", diff)
-        cv2.waitKey(0)
         if score <= 0.1:
             result.append((
                 box[0] + box[2] // 2,

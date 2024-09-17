@@ -1,5 +1,5 @@
 from .recipes import aspect_recipes
-from custom_types import AspectType
+from custom_types import AspectType, PathNotFoundException
 
 
 def used_in_aspects(aspect: AspectType) -> list[AspectType]:
@@ -40,6 +40,6 @@ def find_path(start: AspectType, end: AspectType, length: int) -> list[AspectTyp
             for aspect in connected_aspects(path_last_aspect):
                 new_path = list(path) + [aspect]
                 paths_queue.append(new_path)
-    raise Exception("Aspect path not found")
+    raise PathNotFoundException(f"Aspect path not found: {start=} {end=} {length=}")
 
 
